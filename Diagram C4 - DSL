@@ -1,0 +1,156 @@
+workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT Technologies" {
+
+    !impliedRelationships "false" 
+    !identifiers "hierarchical" 
+
+    model {
+        Cooperativa = person "Cooperativa" "Coffee growing company" "Cooperativa" 
+        Agricultores = person "Agricultor" "Coffee crop farmers" "Agricultores"
+        Operador = person "Operador" "Support of cooperatives and farmers" "Operador" 
+        CoffeeTech = softwareSystem "CoffeeTech" "Aplicación móvil mediante el uso de Machine Learning y Tecnologías IoT" "CoffeeTech" {
+            MySQL = container "MySQL Monitoreo" "Base de datos" "MySQL" "BD"
+            MachineLearningAPI = container "MachineLearningAPI" "MachineLearningAPI" "JEE 8080" "API"
+            APIGatewayFTR = container "APIGatewayFTR" "Microsoft Azure" "" "API"
+            SensorMonitoringContext = container "Sensor Monitoring Context" "Registration and storage of data from sensors." "" "Servicio"
+            ContextAgronomicRecommendations = container "Agronomic Recommendations Context" "Generation of recommendations based on sensor data." "" "Servicio"
+            ManagementAuthenticationContext = container "Management and Authentication Context" "Registration and storage of data from sensors." "" "Servicio"
+            NotificationsAlertsContext = container "Notifications and Alerts Context" "Sending push notifications to mobile devices." "" "Servicio"
+            ReportingContext = container "Reporting Generation Context" "Creation and management of PDF reports." "" "Servicio"{
+                DeteccionFraudes = component "Deteccion de Fraudes" "" "Java  EE" "Componente" 
+                SeguimientoFraudes = component "Seguimiento de Fraudes" "" "SeguimientoFraudes" "Componente" 
+                PerfilEmpresaCobranza = component "PerfilEmpresaCobranza" "" "Perfil Empresa y Tipo de Cobranza" "Componente"
+                ReportingContexts = component "Monitoreo de Servicios" "" "Monitoreo de Servicios" "Componente"
+                MonitoreoOperaciones = component "Monitoreo de Operaciones" "Monitoreo de Operaciones" "" "Componente" 
+            }
+            WebApplication = container "WebApplication" "" "" "Web Browser"
+            SinglePageApplication = container "SinglePageApplication" "" "" "Web Browser"
+            MobileApplication = container "MobileApplication" "" "" "Mobile App"
+            EdgeAPI = container "EdgeAPI" "Embbeded Manager" "" "API"
+            EmbeddedApp = container "EmbeddedApp" "" "" "API"
+            EdgeSPA = container "Edge Single Page Application" "" "" "API"
+        }
+        PushNotificationProvider = softwareSystem "Push Notification Provider" "" "PushNotificationProvider"
+        MeteorologicalService = softwareSystem "Meteorological Service" "" "MeteorologicalService"
+        CoffeeTech -> PushNotificationProvider "reporta" 
+        CoffeeTech.SinglePageApplication -> CoffeeTech.APIGatewayFTR ""
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.SensorMonitoringContext "Read and Write"
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.ContextAgronomicRecommendations "Read and Write"
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.NotificationsAlertsContext "Read and Write"
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.ReportingContext "Read and Write"
+
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.ManagementAuthenticationContext "Read and Write"
+        CoffeeTech.SensorMonitoringContext -> CoffeeTech.MySQL "Writes"
+        CoffeeTech.ContextAgronomicRecommendations -> CoffeeTech.MySQL "Writes"
+        CoffeeTech.NotificationsAlertsContext -> CoffeeTech.MySQL "Writes"
+
+        CoffeeTech.ManagementAuthenticationContext -> CoffeeTech.MySQL "Writes"
+        CoffeeTech.ReportingContext -> CoffeeTech.MySQL "Writes"
+        Cooperativa -> CoffeeTech.MobileApplication "Uses"
+        Cooperativa -> CoffeeTech.SinglePageApplication "Uses"
+        Cooperativa -> CoffeeTech.WebApplication "Uses"
+        Operador -> CoffeeTech.MobileApplication "Uses"
+        Operador -> CoffeeTech.SinglePageApplication "Uses"
+        Operador -> CoffeeTech.WebApplication "Uses"
+        Agricultores -> CoffeeTech.MobileApplication "Uses"
+        Agricultores -> CoffeeTech.SinglePageApplication "Uses"
+        CoffeeTech.WebApplication -> CoffeeTech.SinglePageApplication "Authorize"
+        CoffeeTech.NotificationsAlertsContext -> PushNotificationProvider "Writes" 
+        CoffeeTech.MobileApplication -> CoffeeTech.APIGatewayFTR "Update"
+        CoffeeTech.MachineLearningAPI -> CoffeeTech.APIGatewayFTR "Update"
+        MeteorologicalService -> CoffeeTech.ContextAgronomicRecommendations "Update"
+        CoffeeTech.EdgeAPI -> CoffeeTech.APIGatewayFTR "Update"
+        CoffeeTech.EmbeddedApp -> CoffeeTech.EdgeAPI "Update"
+        CoffeeTech.EdgeSPA -> CoffeeTech.EdgeAPI "Update"
+        Cooperativa -> CoffeeTech "Uses" "WEB" 
+        Agricultores -> CoffeeTech "Uses" "Web"
+        Operador -> CoffeeTech "Uses" "WEB"
+    }
+
+    views {
+        systemContext CoffeeTech "Contexto" "Diagrama de contexto" {
+            include Cooperativa 
+            include Agricultores 
+            include Operador 
+            include CoffeeTech 
+            include PushNotificationProvider 
+        }
+
+        container CoffeeTech "Contenedores" "Vista de contenedores CoffeeTech" {
+            include Cooperativa 
+            include CoffeeTech.MySQL
+            include CoffeeTech.SensorMonitoringContext
+            include CoffeeTech.ManagementAuthenticationContext
+            include CoffeeTech.ContextAgronomicRecommendations
+            include CoffeeTech.NotificationsAlertsContext
+            include CoffeeTech.ReportingContext
+            include CoffeeTech.APIGatewayFTR 
+            include CoffeeTech.MachineLearningAPI
+            include Agricultores 
+            include CoffeeTech.WebApplication
+            include CoffeeTech.SinglePageApplication
+            include CoffeeTech.EdgeAPI
+            include CoffeeTech.MobileApplication
+            include CoffeeTech.EmbeddedApp
+            include CoffeeTech.EdgeSPA
+            include Operador 
+            include PushNotificationProvider
+            include MeteorologicalService
+        }
+
+        component CoffeeTech.ReportingContext "Componente" {
+            include CoffeeTech.ReportingContext.DeteccionFraudes
+            include CoffeeTech.ReportingContext.SeguimientoFraudes
+            include CoffeeTech.ReportingContext.ReportingContexts 
+            include CoffeeTech.ReportingContext.PerfilEmpresaCobranza 
+            include CoffeeTech.ReportingContext.MonitoreoOperaciones
+        }
+        
+        styles {
+            element "Operador" {
+                shape "Person" 
+                background "#26cf48" 
+                color "#ffffff" 
+            }
+            element "BD" {
+                shape "Cylinder" 
+                background "#ec0e0e" 
+                color "#ffffff" 
+            }
+            element "Person" {
+                shape "Person" 
+                background "#232ecd" 
+                color "#ffffff" 
+            }
+            element "CoffeeTech" {
+                shape "RoundedBox" 
+                background "#d49816"
+                color "#ffffff"
+            }
+            element "Servicio"{
+                shape "Hexagon"
+                background "#B057F5"
+                color "#ffffff"
+            }
+            element "Mobile App" {
+                shape MobileDeviceLandscape
+                background #438dd5
+                color "#ffffff"
+            }
+            element "Web Browser" {
+                shape WebBrowser
+                background #438dd5
+                color "#ffffff"
+            }
+            element "Contenedor" {
+                background #85bbf0
+                color "#ffffff"
+            }
+            element "API" {
+                background #85bbf0
+                color "#ffffff"
+            }
+        }
+
+    }
+
+}
