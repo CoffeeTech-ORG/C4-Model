@@ -7,14 +7,27 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         Cooperativa = person "Cooperativa" "Coffee growing company" "Cooperativa" 
         Agricultores = person "Agricultor" "Coffee crop farmers" "Agricultores"
         Operador = person "Operador" "Support of cooperatives and farmers" "Operador" 
-        CoffeeTech = softwareSystem "CoffeeTech" "Aplicación móvil mediante el uso de Machine Learning y Tecnologías IoT" "CoffeeTech" {
-            MySQL = container "MySQL Monitoreo" "Base de datos" "MySQL" "BD"
+        CoffeeTech = softwareSystem "CoffeeTech" "Mobile application using Machine Learning and IoT Technologies" "CoffeeTech" {
+            MySQL = container "Data Base" "Azure Data Base" "MySQL" "BD"
             MachineLearningAPI = container "MachineLearningAPI" "MachineLearningAPI" "JEE 8080" "API"
             APIGatewayFTR = container "APIGatewayFTR" "Microsoft Azure" "" "API"
             SensorMonitoringContext = container "Sensor Monitoring Context" "Registration and storage of data from sensors." "" "Servicio"
             ContextAgronomicRecommendations = container "Agronomic Recommendations Context" "Generation of recommendations based on sensor data." "" "Servicio"
-            ManagementAuthenticationContext = container "Management and Authentication Context" "Registration and storage of data from sensors." "" "Servicio"
-            NotificationsAlertsContext = container "Notifications and Alerts Context" "Sending push notifications to mobile devices." "" "Servicio"
+            ManagementAuthenticationContext = container "Management and Authentication Context" "Registration and storage of data from sensors." "" "Servicio"{
+                UsersController = component "Users Controller" "REST API for users" ".NET" "Componente" 
+                UserApplicationService = component "User ApplicationService" "Provides methods for managing users" ".NET" "Componente" 
+                UsersRepository = component "Users Repository" "Responsible for persistence and recovery of data related to users" ".NET" "Componente"
+                AuthenticationController = component "Authentication Controller" "REST API for users authentication" ".NET" "Componente" 
+                AuthenticationApplicationService = component "Authentication Application Service" "Provides methods for managing users authentication" ".NET" "Componente" 
+                AuthenticationRepository = component "Authentication Repository" "Authentication users informacion" ".NET" "Componente"
+                DomainLayer = component "Domain Layer" "" ".NET" "Componente"
+            }
+            NotificationsAlertsContext = container "Notifications and Alerts Context" "Sending push notifications to mobile devices." "" "Servicio"{
+                MessageController = component "Message Controller" "REST API for notifications" ".NET" "Componente" 
+                MessageApplicationService = component "Message Application Service" "Managing notifications" ".NET" "Componente" 
+                MessageRepository = component "MessageRepository" "Notificationes information" ".NET" "Componente"
+                DomainLayer = component "Domain Layer" "" ".NET" "Componente"
+            }
             ReportingContext = container "Reporting Generation Context" "Creation and management of PDF reports." "" "Servicio"{
                 DeteccionFraudes = component "Deteccion de Fraudes" "" "Java  EE" "Componente" 
                 SeguimientoFraudes = component "Seguimiento de Fraudes" "" "SeguimientoFraudes" "Componente" 
@@ -31,7 +44,8 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         }
         PushNotificationProvider = softwareSystem "Push Notification Provider" "" "PushNotificationProvider"
         MeteorologicalService = softwareSystem "Meteorological Service" "" "MeteorologicalService"
-        CoffeeTech -> PushNotificationProvider "reporta" 
+        CoffeeTech -> PushNotificationProvider "Report"
+        CoffeeTech -> MeteorologicalService "Report"
         CoffeeTech.SinglePageApplication -> CoffeeTech.APIGatewayFTR ""
         CoffeeTech.APIGatewayFTR -> CoffeeTech.SensorMonitoringContext "Read and Write"
         CoffeeTech.APIGatewayFTR -> CoffeeTech.ContextAgronomicRecommendations "Read and Write"
@@ -56,6 +70,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.WebApplication -> CoffeeTech.SinglePageApplication "Authorize"
         CoffeeTech.NotificationsAlertsContext -> PushNotificationProvider "Writes" 
         CoffeeTech.MobileApplication -> CoffeeTech.APIGatewayFTR "Update"
+        CoffeeTech.WebApplication -> CoffeeTech.APIGatewayFTR "Update"
         CoffeeTech.MachineLearningAPI -> CoffeeTech.APIGatewayFTR "Update"
         MeteorologicalService -> CoffeeTech.ContextAgronomicRecommendations "Update"
         CoffeeTech.EdgeAPI -> CoffeeTech.APIGatewayFTR "Update"
@@ -64,15 +79,43 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         Cooperativa -> CoffeeTech "Uses" "WEB" 
         Agricultores -> CoffeeTech "Uses" "Web"
         Operador -> CoffeeTech "Uses" "WEB"
+        
+        //SensorMonitoringContext
+        
+        //ContextAgronomicRecommendations
+        
+        //ManagementAuthenticationContext
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.ManagementAuthenticationContext.UsersController "" ""
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.ManagementAuthenticationContext.AuthenticationController "" ""
+        CoffeeTech.ManagementAuthenticationContext.UsersController -> CoffeeTech.ManagementAuthenticationContext.UserApplicationService "" ""
+        CoffeeTech.ManagementAuthenticationContext.AuthenticationController -> CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService "" ""
+        CoffeeTech.ManagementAuthenticationContext.UserApplicationService -> CoffeeTech.ManagementAuthenticationContext.UsersRepository "" ""
+        CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService -> CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository "" ""
+        CoffeeTech.ManagementAuthenticationContext.UserApplicationService -> CoffeeTech.ManagementAuthenticationContext.DomainLayer "" ""
+        CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService -> CoffeeTech.ManagementAuthenticationContext.DomainLayer "" ""
+        CoffeeTech.ManagementAuthenticationContext.UsersRepository -> CoffeeTech.MySQL "" ""
+        CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository -> CoffeeTech.MySQL "" ""
+        
+        //NotificationsAlertsContext
+        CoffeeTech.APIGatewayFTR -> CoffeeTech.NotificationsAlertsContext.MessageController "" ""
+        CoffeeTech.NotificationsAlertsContext.MessageController -> CoffeeTech.NotificationsAlertsContext.MessageApplicationService "" ""
+        CoffeeTech.NotificationsAlertsContext.MessageApplicationService -> CoffeeTech.NotificationsAlertsContext.MessageRepository "" ""
+        CoffeeTech.NotificationsAlertsContext.MessageApplicationService -> CoffeeTech.NotificationsAlertsContext.DomainLayer "" ""
+        CoffeeTech.NotificationsAlertsContext.MessageRepository -> CoffeeTech.MySQL "" ""
+        
+        //ReportingContext
+        CoffeeTech.ReportingContext.MonitoreoOperaciones -> CoffeeTech.ReportingContext.SeguimientoFraudes "" ""
+        
     }
 
     views {
-        systemContext CoffeeTech "Contexto" "Diagrama de contexto" {
+        systemContext CoffeeTech "Contexto" "Context Diagram" {
             include Cooperativa 
             include Agricultores 
             include Operador 
             include CoffeeTech 
-            include PushNotificationProvider 
+            include PushNotificationProvider
+            include MeteorologicalService
         }
 
         container CoffeeTech "Contenedores" "Vista de contenedores CoffeeTech" {
@@ -96,8 +139,36 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include PushNotificationProvider
             include MeteorologicalService
         }
-
-        component CoffeeTech.ReportingContext "Componente" {
+        
+        component CoffeeTech.ManagementAuthenticationContext "ComponenteAutenticacion" {
+            include CoffeeTech.APIGatewayFTR
+            include CoffeeTech.WebApplication
+            include CoffeeTech.MobileApplication
+            include CoffeeTech.ManagementAuthenticationContext.UsersController
+            include CoffeeTech.ManagementAuthenticationContext.UserApplicationService
+            include CoffeeTech.ManagementAuthenticationContext.UsersRepository 
+            include CoffeeTech.ManagementAuthenticationContext.AuthenticationController
+            include CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService
+            include CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository
+            include CoffeeTech.ManagementAuthenticationContext.DomainLayer
+            include CoffeeTech.MySQL
+        }
+        
+        component CoffeeTech.NotificationsAlertsContext "ComponenteNotificaciones" {
+            include CoffeeTech.APIGatewayFTR
+            include CoffeeTech.WebApplication
+            include CoffeeTech.MobileApplication
+            include CoffeeTech.NotificationsAlertsContext.MessageController
+            include CoffeeTech.NotificationsAlertsContext.MessageApplicationService
+            include CoffeeTech.NotificationsAlertsContext.MessageRepository 
+            include CoffeeTech.NotificationsAlertsContext.DomainLayer
+            include CoffeeTech.MySQL
+        }
+        
+        component CoffeeTech.ReportingContext "ComponenteReportes" {
+            include CoffeeTech.APIGatewayFTR
+            include CoffeeTech.WebApplication
+            include CoffeeTech.MobileApplication
             include CoffeeTech.ReportingContext.DeteccionFraudes
             include CoffeeTech.ReportingContext.SeguimientoFraudes
             include CoffeeTech.ReportingContext.ReportingContexts 
