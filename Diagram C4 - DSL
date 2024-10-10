@@ -4,12 +4,12 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
     !identifiers "hierarchical" 
 
     model {
-        Cooperative = person "Cooperative" "Coffee growing company" "Cooperative" 
+        Manager = person "Manager" "Coffee growing company" "Manager" 
         Farmer = person "Farmer" "Coffee crop farmers" "Farmer"
         CoffeeTech = softwareSystem "CoffeeTech" "Mobile application using Machine Learning and IoT Technologies" "CoffeeTech" {
-            MySQL = container "Database" "Azure Database" "MySQL" "BD"
-            MachineLearningAPI = container "Recommendation System Gateway" "MachineLearningAPI" "JEE 8080" "API"
-            RestFullAPI = container "RestFullAPI" "Microsoft Azure" "" "API"
+            SQLServer = container "Database" "Azure Database" "SQL Server" "BD"
+            MachineLearningAPI = container "Recommendation System RESTful API" "MachineLearningAPI" "JEE 8080" "API"
+            RestFullAPI = container "CoffeeTech RESTful API" "Microsoft Azure" "" "API"
             SensorMonitoringContext = container "Sensor Data Management Context" "Registration and storage of data from sensors IoT." "" "Servicio"{
                 DevicesController = component "Devices Controller" "REST API endpoints for devices" ".NET" "Componente" 
                 DevicesApplicationService = component "Devices Application Service" "Provides methods for managing devices" ".NET" "Componente" 
@@ -46,23 +46,23 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             WebApplication = container "WebApplication" "" "Framework Vue.js and .NET" "Web Browser"
             SinglePageApplication = container "SinglePageApplication" "" "JavaScript" "Contenedor"
             MobileApplication = container "MobileApplication" "" "Framework Flutter" "Mobile App"
-            EdgeAPI = container "EdgeAPI" "Embbeded Manager" "" "API"
-            EmbeddedApp = container "EmbeddedApp" "" "" "API"
+            EdgeAPI = container "IoT Edge Hub Embedded App & API" "Embbeded Manager" "" "API"
+            EmbeddedApp = container "IoT Worker Embedded App" "" "" "API"
             EdgeSPA = container "Edge Single Page Application" "" "" "API"
         }
-        PushNotificationProvider = softwareSystem "Push Notification Provider" "Notification service" "PushNotificationProvider"
-        MeteorologicalService = softwareSystem "Meteorological Service" "Platform offering weather API"  "MeteorologicalService"
-        MLmodelAPI  = softwareSystem "ML Interopelability Service" "Data for recommendation" "MLmodelAPI"
+        PushNotificationProvider = softwareSystem "Push Notification Service Provider" "Notification service" "PushNotificationProvider"
+        MeteorologicalService = softwareSystem "Weather Data Service Provider" "Platform offering weather API"  "MeteorologicalService"
+        MLmodelAPI  = softwareSystem "Machine Learning Platform Service Provider" "Data for recommendation" "MLmodelAPI"
         
         CoffeeTech -> PushNotificationProvider "Report"
         CoffeeTech -> MeteorologicalService "Report"
         CoffeeTech -> MLmodelAPI "Report"
-        CoffeeTech.RestFullAPI -> CoffeeTech.MySQL "Read and write to" "JDBC"
+        CoffeeTech.RestFullAPI -> CoffeeTech.SQLServer "Read and write to" "JDBC"
         CoffeeTech.RestFullAPI -> PushNotificationProvider "Send notifications" ""
         CoffeeTech.RestFullAPI -> MeteorologicalService "Uses" "XML/HTTPS"
-        Cooperative -> CoffeeTech.MobileApplication "Uses"
-        Cooperative -> CoffeeTech.SinglePageApplication "Uses"
-        Cooperative -> CoffeeTech.WebApplication "Uses" "HTTPS"
+        Manager -> CoffeeTech.MobileApplication "Uses"
+        Manager -> CoffeeTech.SinglePageApplication "Uses"
+        Manager -> CoffeeTech.WebApplication "Uses" "HTTPS"
         Farmer -> CoffeeTech.MobileApplication "Uses"
         Farmer -> CoffeeTech.SinglePageApplication "Uses"
         CoffeeTech.WebApplication -> CoffeeTech.SinglePageApplication "Authorize"
@@ -75,7 +75,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.EdgeAPI -> CoffeeTech.RestFullAPI "Update"
         CoffeeTech.EmbeddedApp -> CoffeeTech.EdgeAPI "Send data to" 
         CoffeeTech.EdgeSPA -> CoffeeTech.EdgeAPI "Uses" "JSON/HTTPS"
-        Cooperative -> CoffeeTech "Uses" "WEB" 
+        Manager -> CoffeeTech "Uses" "WEB" 
         Farmer -> CoffeeTech "Uses" "Web"
         CoffeeTech.MachineLearningAPI -> MLmodelAPI "Uses" "HTTPS"
         
@@ -84,7 +84,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.SensorMonitoringContext.DevicesController -> CoffeeTech.SensorMonitoringContext.DevicesApplicationService "" ""
         CoffeeTech.SensorMonitoringContext.DevicesApplicationService -> CoffeeTech.SensorMonitoringContext.DevicesRepository "" ""
         CoffeeTech.SensorMonitoringContext.DevicesApplicationService -> CoffeeTech.SensorMonitoringContext.DomainLayer "" ""
-        CoffeeTech.SensorMonitoringContext.DevicesRepository -> CoffeeTech.MySQL "" ""
+        CoffeeTech.SensorMonitoringContext.DevicesRepository -> CoffeeTech.SQLServer "" ""
         CoffeeTech.WebApplication -> CoffeeTech.SensorMonitoringContext.DevicesController "API Request" "JSON/HTTPS"
         CoffeeTech.MobileApplication -> CoffeeTech.SensorMonitoringContext.DevicesController "API Request" "JSON/HTTPS"
         
@@ -93,7 +93,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.ContextAgronomicRecommendations.RecommendationsController -> CoffeeTech.ContextAgronomicRecommendations.RecommendationsApplicationService "" ""
         CoffeeTech.ContextAgronomicRecommendations.RecommendationsApplicationService -> CoffeeTech.ContextAgronomicRecommendations.PredictionsRepository "" ""
         CoffeeTech.ContextAgronomicRecommendations.RecommendationsApplicationService -> CoffeeTech.ContextAgronomicRecommendations.DomainLayer "" ""
-        CoffeeTech.ContextAgronomicRecommendations.PredictionsRepository -> CoffeeTech.MySQL "" ""
+        CoffeeTech.ContextAgronomicRecommendations.PredictionsRepository -> CoffeeTech.SQLServer "" ""
         CoffeeTech.ContextAgronomicRecommendations.RecommendationsApplicationService ->  MeteorologicalService "" ""
         CoffeeTech.ContextAgronomicRecommendations.RecommendationsApplicationService ->  MLmodelAPI "" ""
         CoffeeTech.WebApplication -> CoffeeTech.ContextAgronomicRecommendations.RecommendationsController "API Request" "JSON/HTTPS"
@@ -108,8 +108,8 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService -> CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository "" ""
         CoffeeTech.ManagementAuthenticationContext.UserApplicationService -> CoffeeTech.ManagementAuthenticationContext.DomainLayer "" ""
         CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService -> CoffeeTech.ManagementAuthenticationContext.DomainLayer "" ""
-        CoffeeTech.ManagementAuthenticationContext.UsersRepository -> CoffeeTech.MySQL "" ""
-        CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository -> CoffeeTech.MySQL "" ""
+        CoffeeTech.ManagementAuthenticationContext.UsersRepository -> CoffeeTech.SQLServer "" ""
+        CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository -> CoffeeTech.SQLServer "" ""
         CoffeeTech.WebApplication -> CoffeeTech.ManagementAuthenticationContext.UsersController "API Request" "JSON/HTTPS"
         CoffeeTech.MobileApplication -> CoffeeTech.ManagementAuthenticationContext.UsersController "API Request" "JSON/HTTPS"
         CoffeeTech.WebApplication -> CoffeeTech.ManagementAuthenticationContext.AuthenticationController "API Request" "JSON/HTTPS"
@@ -120,7 +120,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.NotificationsAlertsContext.MessageController -> CoffeeTech.NotificationsAlertsContext.MessageApplicationService "" ""
         CoffeeTech.NotificationsAlertsContext.MessageApplicationService -> CoffeeTech.NotificationsAlertsContext.MessageRepository "" ""
         CoffeeTech.NotificationsAlertsContext.MessageApplicationService -> CoffeeTech.NotificationsAlertsContext.DomainLayer "" ""
-        CoffeeTech.NotificationsAlertsContext.MessageRepository -> CoffeeTech.MySQL "" ""
+        CoffeeTech.NotificationsAlertsContext.MessageRepository -> CoffeeTech.SQLServer "" ""
         PushNotificationProvider ->  CoffeeTech.NotificationsAlertsContext.MessageApplicationService "" "" 
         CoffeeTech.WebApplication -> CoffeeTech.NotificationsAlertsContext.MessageController "API Request" "JSON/HTTPS"
         CoffeeTech.MobileApplication -> CoffeeTech.NotificationsAlertsContext.MessageController "API Request" "JSON/HTTPS"
@@ -130,14 +130,14 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         CoffeeTech.FarmManagementContext.FarmManagementController -> CoffeeTech.FarmManagementContext.FarmManagementApplicationService "" ""
         CoffeeTech.FarmManagementContext.FarmManagementApplicationService -> CoffeeTech.FarmManagementContext.FarmManagementRepository "" ""
         CoffeeTech.FarmManagementContext.FarmManagementApplicationService -> CoffeeTech.FarmManagementContext.DomainLayer "" ""
-        CoffeeTech.FarmManagementContext.FarmManagementRepository -> CoffeeTech.MySQL "" ""
+        CoffeeTech.FarmManagementContext.FarmManagementRepository -> CoffeeTech.SQLServer "" ""
         CoffeeTech.WebApplication -> CoffeeTech.FarmManagementContext.FarmManagementController "API Request" "JSON/HTTPS"
         CoffeeTech.MobileApplication -> CoffeeTech.FarmManagementContext.FarmManagementController "API Request" "JSON/HTTPS"
     }
 
     views {
         systemContext CoffeeTech "Contexto" "Context Diagram" {
-            include Cooperative 
+            include Manager 
             include Farmer 
             include CoffeeTech 
             include PushNotificationProvider
@@ -146,7 +146,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
         }
 
         container CoffeeTech "Contenedores" "ContainerCoffeeTech" {
-            include Cooperative
+            include Manager
             include Farmer
             include PushNotificationProvider
             include MeteorologicalService
@@ -159,7 +159,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include CoffeeTech.MobileApplication
             include CoffeeTech.EmbeddedApp
             include CoffeeTech.EdgeSPA
-            include CoffeeTech.MySQL
+            include CoffeeTech.SQLServer
         }
         
         component CoffeeTech.SensorMonitoringContext "ComponentSensorMonitoring" {
@@ -169,7 +169,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include CoffeeTech.SensorMonitoringContext.DevicesApplicationService
             include CoffeeTech.SensorMonitoringContext.DevicesRepository 
             include CoffeeTech.SensorMonitoringContext.DomainLayer
-            include CoffeeTech.MySQL
+            include CoffeeTech.SQLServer
         }
         
         component CoffeeTech.ContextAgronomicRecommendations "ComponenteRecommendations" {
@@ -179,7 +179,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include CoffeeTech.ContextAgronomicRecommendations.RecommendationsApplicationService
             include CoffeeTech.ContextAgronomicRecommendations.PredictionsRepository 
             include CoffeeTech.ContextAgronomicRecommendations.DomainLayer
-            include CoffeeTech.MySQL
+            include CoffeeTech.SQLServer
             include MeteorologicalService
             include MLmodelAPI
         }
@@ -194,7 +194,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include CoffeeTech.ManagementAuthenticationContext.AuthenticationApplicationService
             include CoffeeTech.ManagementAuthenticationContext.AuthenticationRepository
             include CoffeeTech.ManagementAuthenticationContext.DomainLayer
-            include CoffeeTech.MySQL
+            include CoffeeTech.SQLServer
         }
         
         component CoffeeTech.NotificationsAlertsContext "ComponenteNotificaciones" {
@@ -204,7 +204,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include CoffeeTech.NotificationsAlertsContext.MessageApplicationService
             include CoffeeTech.NotificationsAlertsContext.MessageRepository 
             include CoffeeTech.NotificationsAlertsContext.DomainLayer
-            include CoffeeTech.MySQL
+            include CoffeeTech.SQLServer
             include PushNotificationProvider
         }
         
@@ -215,7 +215,7 @@ workspace "CoffeeTech System" "Mobile application using Machine Learning and IoT
             include CoffeeTech.FarmManagementContext.FarmManagementApplicationService
             include CoffeeTech.FarmManagementContext.FarmManagementRepository 
             include CoffeeTech.FarmManagementContext.DomainLayer
-            include CoffeeTech.MySQL
+            include CoffeeTech.SQLServer
         }
         
         styles {
